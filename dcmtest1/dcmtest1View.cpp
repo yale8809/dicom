@@ -29,7 +29,6 @@ BEGIN_MESSAGE_MAP(Cdcmtest1View, CView)
 	ON_UPDATE_COMMAND_UI(ID_SHOW_TAG , OnUpdateTagMenu)
 	ON_COMMAND(ID_WCWW_Default , OnUpdateDefaultWCWW)
 	ON_COMMAND(ID_WCWW_FULL , OnUpdateFullWCWW)
-	ON_WM_CREATE()
 //	ON_WM_ERASEBKGND()
 ON_WM_LBUTTONDOWN()
 ON_WM_LBUTTONUP()
@@ -44,8 +43,7 @@ Cdcmtest1View::Cdcmtest1View()
 	pDataset(NULL),
 	m_bShowTagEnable(false),
 	m_curWC(0),
-	m_curWW(0),
-	m_WCWWtype(0)
+	m_curWW(0)
 {
 	// TODO: 在此处添加构造代码
 	//AllocConsole();                     // 打开控制台资源
@@ -219,7 +217,8 @@ void Cdcmtest1View::OnDraw(CDC* pDC)
 			(LPBITMAPINFO)pDoc->m_lpBMIH,DIB_PAL_COLORS,SRCCOPY);
 		m_bShowTagEnable = true;
 		
-		UpdateLabelText();
+		//UpdateLabelText();
+		UpdateLabelText(pDC);
 	}
 
 	// TODO: 在此处为本机数据添加绘制代码
@@ -311,59 +310,8 @@ Cdcmtest1Doc* Cdcmtest1View::GetDocument() const // 非调试版本是内联的
 
 // Cdcmtest1View 消息处理程序
 
-
-int Cdcmtest1View::OnCreate(LPCREATESTRUCT lpCreateStruct)
-{
-	if (CView::OnCreate(lpCreateStruct) == -1)
-		return -1;
-
-	// TODO:  在此添加您专用的创建代码
-	CRect rect(0,0,0,0);
-
-	m_textPatName.Create("test", WS_CHILD|WS_VISIBLE, rect, this, IDC_PatName);
-	m_textPatName.ShowWindow(SW_SHOWNORMAL);
-
-	m_textPatID.Create("testtest", WS_CHILD|WS_VISIBLE, rect, this, IDC_PatID);
-	m_textPatID.ShowWindow(SW_SHOWNORMAL);
-
-	m_textPatBirth.Create("", WS_CHILD|WS_VISIBLE, rect, this, IDC_PatBirth);
-	m_textPatBirth.ShowWindow(SW_SHOWNORMAL);
-
-	m_textPatGender.Create("", WS_CHILD|WS_VISIBLE, rect, this, IDC_PatGender);
-	m_textPatGender.ShowWindow(SW_SHOWNORMAL);
-
-	m_textInstitution.Create("", WS_CHILD|WS_VISIBLE, rect, this, IDC_Institution);
-	m_textInstitution.ShowWindow(SW_SHOWNORMAL);
-
-	m_textPPSID.Create("", WS_CHILD|WS_VISIBLE, rect, this, IDC_PPSID);
-	m_textPPSID.ShowWindow(SW_SHOWNORMAL);
-
-	m_textStudyDes.Create("", WS_CHILD|WS_VISIBLE, rect, this, IDC_StudyDes);
-	m_textStudyDes.ShowWindow(SW_SHOWNORMAL);
-
-	m_textSeriesDes.Create("", WS_CHILD|WS_VISIBLE, rect, this, IDC_SeriesDes);
-	m_textSeriesDes.ShowWindow(SW_SHOWNORMAL);
-
-	m_textPixelValue.Create("", WS_CHILD|WS_VISIBLE, rect, this, IDC_PixelValue);
-	m_textPixelValue.ShowWindow(SW_SHOWNORMAL);
-
-	m_textWC.Create("", WS_CHILD|WS_VISIBLE, rect, this, IDC_WC);
-	m_textWC.ShowWindow(SW_SHOWNORMAL);
-
-	m_textWW.Create("", WS_CHILD|WS_VISIBLE, rect, this, IDC_WW);
-	m_textWW.ShowWindow(SW_SHOWNORMAL);
-
-	m_textCtnDate.Create("", WS_CHILD|WS_VISIBLE, rect, this, IDC_CtnDate);
-	m_textCtnDate.ShowWindow(SW_SHOWNORMAL);
-
-	m_textCtnTime.Create("", WS_CHILD|WS_VISIBLE, rect, this, IDC_CtnTime);
-	m_textCtnTime.ShowWindow(SW_SHOWNORMAL);
-
-	return 0;
-}
-
-void Cdcmtest1View::UpdateLabelText()
-{
+void Cdcmtest1View::UpdateLabelText(CDC* pDC)
+{	
 	Cdcmtest1Doc* pDoc = GetDocument();
 
 	int txt_width = 240;
@@ -372,82 +320,69 @@ void Cdcmtest1View::UpdateLabelText()
     GetClientRect(&rect);
 	int view_width = rect.Width();
 	int view_height = rect.Height();
-	m_textPatName.MoveWindow(CRect(view_width-txt_width, 0, view_width, txt_height));
-	m_textPatID.MoveWindow(CRect(view_width-txt_width, txt_height, view_width, 2*txt_height));
-	m_textPatBirth.MoveWindow(CRect(view_width-txt_width, 2*txt_height, view_width-txt_width/6, 3*txt_height));
-	m_textPatGender.MoveWindow(CRect(view_width-txt_width/6, 2*txt_height, view_width, 3*txt_height));
-	m_textInstitution.MoveWindow(CRect(view_width-txt_width, 3*txt_height, view_width, 4*txt_height));
-	m_textPPSID.MoveWindow(CRect(view_width-txt_width, 4*txt_height, view_width, 5*txt_height));
-	m_textStudyDes.MoveWindow(CRect(view_width-txt_width, 5*txt_height, view_width, 6*txt_height));
-	m_textSeriesDes.MoveWindow(CRect(view_width-txt_width, 6*txt_height, view_width, 7*txt_height));
 
+	pDC->SetTextColor(RGB(255,255,255));
+	pDC->SetBkMode(TRANSPARENT);
 	
-	m_textPixelValue.MoveWindow(CRect(0, view_height-2*txt_height, txt_width, view_height-txt_height));
-	m_textWC.MoveWindow(CRect(0, view_height-txt_height, txt_width/2, view_height));
-	m_textWW.MoveWindow(CRect(txt_width/2, view_height-txt_height, txt_width, view_height));
-
-	m_textCtnDate.MoveWindow(CRect(view_width-txt_width, view_height-txt_height, view_width-txt_width/2, view_height));
-	m_textCtnTime.MoveWindow(CRect(view_width-txt_width/2, view_height-txt_height, view_width, view_height));
-
 	OFString tempstring;
 	if (pDoc->pDataset->findAndGetOFString(DCM_PatientName, tempstring).good())
 	{
-		m_textPatName.SetWindowTextA(tempstring.c_str());
+		pDC->TextOutA(view_width-txt_width, 0, tempstring.data());
 	}
 	tempstring.clear();
 	if (pDoc->pDataset->findAndGetOFString(DCM_PatientID, tempstring).good())
 	{
-		m_textPatID.SetWindowTextA(tempstring.c_str());
+		pDC->TextOutA(view_width-txt_width, txt_height, tempstring.data());
 	}
 	tempstring.clear();
 	if (pDoc->pDataset->findAndGetOFString(DCM_PatientBirth, tempstring).good())
 	{
-		m_textPatBirth.SetWindowTextA(tempstring.c_str());
+		pDC->TextOutA(view_width-txt_width, 2*txt_height, tempstring.data());
 	}
 	tempstring.clear();
 	if (pDoc->pDataset->findAndGetOFString(DCM_PatientSex, tempstring).good())
 	{
-		m_textPatGender.SetWindowTextA(tempstring.c_str());
+		pDC->TextOutA(view_width-txt_width/6, 2*txt_height, tempstring.data());
 	}
 	tempstring.clear();
 	if (pDoc->pDataset->findAndGetOFString(DCM_Institution, tempstring).good())
 	{
-		m_textInstitution.SetWindowTextA(tempstring.c_str());
+		pDC->TextOutA(view_width-txt_width, 3*txt_height, tempstring.data());
 	}
 	tempstring.clear();
 	if (pDoc->pDataset->findAndGetOFString(DCM_PPSID, tempstring).good())
 	{
-		m_textPPSID.SetWindowTextA(tempstring.c_str());
+		pDC->TextOutA(view_width-txt_width, 4*txt_height, tempstring.data());
 	}
 	tempstring.clear();
 	if (pDoc->pDataset->findAndGetOFString(DCM_StudyDes, tempstring).good())
 	{
-		m_textStudyDes.SetWindowTextA(tempstring.c_str());
+		pDC->TextOutA(view_width-txt_width, 5*txt_height, tempstring.data());
 	}
 	tempstring.clear();
 	if (pDoc->pDataset->findAndGetOFString(DCM_SeriesDes, tempstring).good())
 	{
-		m_textSeriesDes.SetWindowTextA(tempstring.c_str());
+		pDC->TextOutA(view_width-txt_width, 6*txt_height, tempstring.data());
 	}
 
 	char wc_ww[10];
 	itoa(m_curWC, wc_ww, 10);
-	m_textWC.SetWindowTextA(wc_ww);
+	pDC->TextOutA(0, view_height-txt_height, wc_ww);
 
 	itoa(m_curWW, wc_ww, 10);
-	m_textWW.SetWindowTextA(wc_ww);
-
+	pDC->TextOutA(txt_width/2, view_height-txt_height, wc_ww);
 
 	tempstring.clear();
 	if (pDoc->pDataset->findAndGetOFString(DCM_CtnDate, tempstring).good())
 	{
-		m_textCtnDate.SetWindowTextA(tempstring.c_str());
+		pDC->TextOutA(view_width-txt_width, view_height-txt_height, tempstring.data());
 	}
 	tempstring.clear();
 	if (pDoc->pDataset->findAndGetOFString(DCM_CtnTime, tempstring).good())
 	{
-		m_textCtnTime.SetWindowTextA(tempstring.c_str());
+		pDC->TextOutA(view_width-txt_width/2, view_height-txt_height, tempstring.data());
 	}
+
 }
 
 //BOOL Cdcmtest1View::OnEraseBkgnd(CDC* pDC)

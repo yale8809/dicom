@@ -62,7 +62,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 private:
-	void UpdateLabelText();
+	void UpdateLabelText(CDC* pDC);
 public:
 	DicomImage *dcm;
 	DcmFileFormat *pDicomFile;
@@ -70,29 +70,14 @@ public:
 
 private:
 	bool m_bShowTagEnable;
-	CStatic m_textPatName;
-	CStatic m_textPatID;
-	CStatic m_textPatBirth;
-	CStatic m_textPatGender;
-	CStatic m_textInstitution;
-	CStatic m_textPPSID;
-	CStatic m_textStudyDes;
-	CStatic m_textSeriesDes;	
-	CStatic m_textPixelValue;
-	CStatic m_textWC;
-	CStatic m_textWW;
-	CStatic m_textCtnDate;
-	CStatic m_textCtnTime;
 
 	double m_curWC;
 	double m_curWW;
-	int m_WCWWtype;
 	bool isResetWindow;
 	CPoint m_startPoint;
 	CPoint m_curPoint;
 	CPoint m_endPoint;
 public:
-	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 //	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
