@@ -54,7 +54,7 @@ public:
 	afx_msg void OnFileOpen();
 	DicomImage *dcm;
 	LPBITMAPINFOHEADER m_lpBMIH;
-	//void *pDicomDibits ;
+	void *pDicomDibits ;
 	DcmFileFormat *pDicomFile;
 	DcmDataset *pDataset;
 	CString m_Pathname;

@@ -31,6 +31,9 @@ BEGIN_MESSAGE_MAP(Cdcmtest1View, CView)
 	ON_COMMAND(ID_WCWW_FULL , OnUpdateFullWCWW)
 	ON_WM_CREATE()
 //	ON_WM_ERASEBKGND()
+ON_WM_LBUTTONDOWN()
+ON_WM_LBUTTONUP()
+ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 // Cdcmtest1View 构造/析构
@@ -45,11 +48,15 @@ Cdcmtest1View::Cdcmtest1View()
 	m_WCWWtype(0)
 {
 	// TODO: 在此处添加构造代码
+	//AllocConsole();                     // 打开控制台资源
 
+	//freopen( "CONOUT$", "w+t", stdout );// 申请写
+	//freopen( "CONIN$", "r+t", stdin );  // 申请读
 }
 
 Cdcmtest1View::~Cdcmtest1View()
 {
+	//FreeConsole();                      // 释放控制台资源
 }
 
 BOOL Cdcmtest1View::PreCreateWindow(CREATESTRUCT& cs)
@@ -205,37 +212,10 @@ void Cdcmtest1View::OnDraw(CDC* pDC)
 		destX = (rect.Width() - destWidth)/2;
 		destY = 0;
 
-		if(m_WCWWtype == 0)
-		{
-			OFString wc,ww;
-			if (pDoc->pDataset->findAndGetOFString(DCM_WC, wc).good()&&
-				pDoc->pDataset->findAndGetOFString(DCM_WW, ww).good())
-			{
-				m_curWC = atof(wc.c_str());
-				m_curWW = atof(ww.c_str());
-				pDoc->dcm->setWindow(m_curWC,m_curWW);
-			}
-		} 
-		else if(m_WCWWtype == 1)
-		{
-			double min,max;
-			pDoc->dcm->getMinMaxValues(min,max);
-			m_curWC = (max-min)/2;
-			m_curWW = (max+min)/2;
-			pDoc->dcm->setWindow(m_curWC,m_curWW);
-		}
-		
-		void* pDicomDibits = NULL;
-		int size = pDoc->dcm->createWindowsDIB(pDicomDibits,0,0,24,1,1);
-		
-		if( size == 0)
-		{
-			AfxMessageBox("Create DIB failed!");
-		}
 
 		StretchDIBits(pDC->GetSafeHdc(),destX,destY,destWidth,
 			destHeight,0,0,pDoc->m_lpBMIH->biWidth,
-			pDoc->m_lpBMIH->biHeight,pDicomDibits,
+			pDoc->m_lpBMIH->biHeight,pDoc->pDicomDibits,
 			(LPBITMAPINFO)pDoc->m_lpBMIH,DIB_PAL_COLORS,SRCCOPY);
 		m_bShowTagEnable = true;
 		
@@ -265,15 +245,47 @@ void Cdcmtest1View::OnUpdateTagMenu(CCmdUI *pCmdUI)
 void Cdcmtest1View::OnUpdateDefaultWCWW()
 {
 	Cdcmtest1Doc* pDoc = GetDocument();
-	m_WCWWtype = 0;
-	pDoc->UpdateAllViews(NULL);
+	OFString wc,ww;
+	if (pDoc->pDataset->findAndGetOFString(DCM_WC, wc).good()&&
+		pDoc->pDataset->findAndGetOFString(DCM_WW, ww).good())
+	{
+		m_curWC = atof(wc.c_str());
+		m_curWW = atof(ww.c_str());
+		pDoc->dcm->setWindow(m_curWC,m_curWW);
+	}
+	
+		
+	if(pDoc->pDicomDibits!=NULL)
+		delete[]pDoc->pDicomDibits;
+	int size = pDoc->dcm->createWindowsDIB(pDoc->pDicomDibits,0,0,24,1,1);
+		
+	if( size == 0)
+	{
+		AfxMessageBox("Create DIB failed!");
+	}
+		
+	Invalidate();
 }
 
 void Cdcmtest1View::OnUpdateFullWCWW()
 {
 	Cdcmtest1Doc* pDoc = GetDocument();
-	m_WCWWtype = 1;
-	pDoc->UpdateAllViews(NULL);
+	double min,max;
+	pDoc->dcm->getMinMaxValues(min,max);
+	m_curWC = (max-min)/2;
+	m_curWW = (max+min)/2;
+	pDoc->dcm->setWindow(m_curWC,m_curWW);
+
+	if(pDoc->pDicomDibits!=NULL)
+		delete[]pDoc->pDicomDibits;
+	int size = pDoc->dcm->createWindowsDIB(pDoc->pDicomDibits,0,0,24,1,1);
+		
+	if( size == 0)
+	{
+		AfxMessageBox("Create DIB failed!");
+	}
+		
+	Invalidate();
 }
 
 // Cdcmtest1View 诊断
@@ -451,3 +463,67 @@ void Cdcmtest1View::UpdateLabelText()
 //
 //	return CView::OnEraseBkgnd(pDC);
 //}
+
+
+void Cdcmtest1View::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+
+	CView::OnLButtonDown(nFlags, point);
+
+	m_startPoint.x = point.x;
+	m_startPoint.y = point.y;
+	m_curPoint.x = point.x;
+	m_curPoint.y = point.y;
+	printf("m_startPoint.x = %d, m_startPoint.y = %d \r\n",m_startPoint.x, m_startPoint.y);
+	isResetWindow = true;
+}
+
+
+void Cdcmtest1View::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+
+	CView::OnLButtonUp(nFlags, point);
+
+	isResetWindow = false;
+}
+
+
+void Cdcmtest1View::OnMouseMove(UINT nFlags, CPoint point)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+
+	CView::OnMouseMove(nFlags, point);
+	Cdcmtest1Doc* pDoc = GetDocument();
+
+	if (isResetWindow && pDoc->dcm!=NULL) 
+	{
+		if(abs(point.x-m_curPoint.x)+abs(point.y-m_curPoint.y)>10)
+		{
+			printf("m_curPoint.x = %d, m_curPoint.y = %d \r\n",m_curPoint.x, m_curPoint.y);
+			printf("point.x = %d, point.y = %d \r\n",point.x, point.y);
+			m_curWC=m_curWC+(-point.x+m_curPoint.x);
+			m_curWW=m_curWW+(point.y-m_curPoint.y);
+			m_curPoint.x=point.x;
+			m_curPoint.y=point.y;
+			if(m_curWC>2047)
+				m_curWC=2047;
+			if(m_curWC<-2048)
+				m_curWC=-2048;
+			if(m_curWW>2047)
+				m_curWW=2047;
+			if(m_curWW<-2048)
+				m_curWW = -2048;
+			ASSERT_VALID(pDoc);
+			pDoc->dcm->setWindow(m_curWC,m_curWW);
+			if(pDoc->pDicomDibits!=NULL)
+				delete[]pDoc->pDicomDibits;
+			int m_iDibSize=pDoc->dcm->createWindowsDIB(pDoc->pDicomDibits,0,0,24,1,1);
+			if(m_iDibSize==0)
+				AfxMessageBox("createWindowsDIB创建DIB文件出错！");
+			Invalidate();
+		}
+	}
+}
+

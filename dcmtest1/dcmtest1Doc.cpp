@@ -39,9 +39,10 @@ CString extname;    //打开的图片文件的扩展名
 // CImage m_MyImage;    //用于读取与显示jpg等格式的图像文件
 
 Cdcmtest1Doc::Cdcmtest1Doc()
-	: dcm(NULL)
-	, m_Pathname(_T(""))
-	, strPicPath(_T(""))
+	: dcm(NULL),
+	m_Pathname(_T("")),
+	strPicPath(_T("")),
+	pDicomDibits(NULL)
 {
 	// TODO: 在此添加一次性构造代码
 
@@ -77,7 +78,7 @@ BOOL Cdcmtest1Doc::OnOpenDocument(LPCTSTR lpszPathName)
 	{
 		AfxMessageBox(DicomImage::getString(dcm->getStatus()));
 	}
-	//dcm->setWindow(35,320);
+	dcm->setWindow(35,320);
 
 	m_lpBMIH = (LPBITMAPINFOHEADER) new char[sizeof(BITMAPINFOHEADER)
 	+sizeof(RGBQUAD)*256];
@@ -91,6 +92,16 @@ BOOL Cdcmtest1Doc::OnOpenDocument(LPCTSTR lpszPathName)
 	m_lpBMIH->biXPelsPerMeter = 0;
 	m_lpBMIH->biYPelsPerMeter = 0;
 	
+		
+	if(pDicomDibits!=NULL)
+		delete[]pDicomDibits;
+	int size = dcm->createWindowsDIB(pDicomDibits,0,0,24,1,1);
+		
+	if( size == 0)
+	{
+		AfxMessageBox("Create DIB failed!");
+	}
+
 	return TRUE;
 }
 
