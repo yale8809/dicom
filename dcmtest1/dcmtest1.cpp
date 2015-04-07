@@ -158,6 +158,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnFileOpen();
+	afx_msg void OnCtBone();
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
@@ -198,3 +199,4 @@ void CAboutDlg::OnFileOpen()
 // 	}
 	// TODO: 在此添加命令处理程序代码
 }
+

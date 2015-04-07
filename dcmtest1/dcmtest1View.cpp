@@ -29,12 +29,42 @@ BEGIN_MESSAGE_MAP(Cdcmtest1View, CView)
 	ON_UPDATE_COMMAND_UI(ID_SHOW_TAG , OnUpdateTagMenu)
 	ON_UPDATE_COMMAND_UI(ID_WCWW_FULL , OnUpdateTagMenu)
 	ON_UPDATE_COMMAND_UI(ID_WCWW_Default , OnUpdateTagMenu)
+	ON_UPDATE_COMMAND_UI(ID_Display , OnUpdateTagMenu)
+	ON_UPDATE_COMMAND_UI(ID_WW_Setting , OnUpdateTagMenu)
+	ON_UPDATE_COMMAND_UI(ID_CT_ABD , OnUpdateTagMenu)
+	ON_UPDATE_COMMAND_UI(ID_CT_Angio , OnUpdateTagMenu)
+	ON_UPDATE_COMMAND_UI(ID_CT_Bone , OnUpdateTagMenu)
+	ON_UPDATE_COMMAND_UI(ID_CT_Brain , OnUpdateTagMenu)
+	ON_UPDATE_COMMAND_UI(ID_CT_Chest , OnUpdateTagMenu)
+	ON_UPDATE_COMMAND_UI(ID_CT_Lungs , OnUpdateTagMenu)
+	ON_UPDATE_COMMAND_UI(ID_Other_WW_1 , OnUpdateTagMenu)
+	ON_UPDATE_COMMAND_UI(ID_Other_WW_2 , OnUpdateTagMenu)
+	ON_UPDATE_COMMAND_UI(ID_Other_WW_3 , OnUpdateTagMenu)
+	ON_UPDATE_COMMAND_UI(ID_Other_WW_4 , OnUpdateTagMenu)
+	ON_UPDATE_COMMAND_UI(ID_Other_WW_5 , OnUpdateTagMenu)
+	ON_UPDATE_COMMAND_UI(ID_Other_WW_6 , OnUpdateTagMenu)
+	ON_UPDATE_COMMAND_UI(ID_Other_WW_7 , OnUpdateTagMenu)
+	ON_UPDATE_COMMAND_UI(ID_Other_WW_8 , OnUpdateTagMenu)
 	ON_COMMAND(ID_WCWW_Default , OnUpdateDefaultWCWW)
 	ON_COMMAND(ID_WCWW_FULL , OnUpdateFullWCWW)
 //	ON_WM_ERASEBKGND()
 ON_WM_LBUTTONDOWN()
 ON_WM_LBUTTONUP()
 ON_WM_MOUSEMOVE()
+ON_COMMAND(ID_CT_ABD, &Cdcmtest1View::OnCtAbd)
+ON_COMMAND(ID_CT_Angio, &Cdcmtest1View::OnCtAngio)
+ON_COMMAND(ID_CT_Bone, &Cdcmtest1View::OnCtBone)
+ON_COMMAND(ID_CT_Brain, &Cdcmtest1View::OnCtBrain)
+ON_COMMAND(ID_CT_Chest, &Cdcmtest1View::OnCtChest)
+ON_COMMAND(ID_CT_Lungs, &Cdcmtest1View::OnCtLungs)
+ON_COMMAND(ID_Other_WW_1, &Cdcmtest1View::OnOtherWw1)
+ON_COMMAND(ID_Other_WW_2, &Cdcmtest1View::OnOtherWw2)
+ON_COMMAND(ID_Other_WW_3, &Cdcmtest1View::OnOtherWw3)
+ON_COMMAND(ID_Other_WW_4, &Cdcmtest1View::OnOtherWw4)
+ON_COMMAND(ID_Other_WW_5, &Cdcmtest1View::OnOtherWw5)
+ON_COMMAND(ID_Other_WW_6, &Cdcmtest1View::OnOtherWw6)
+ON_COMMAND(ID_Other_WW_7, &Cdcmtest1View::OnOtherWw7)
+ON_COMMAND(ID_Other_WW_8, &Cdcmtest1View::OnOtherWw8)
 END_MESSAGE_MAP()
 
 // Cdcmtest1View 构造/析构
@@ -140,6 +170,7 @@ void Cdcmtest1View::OnDraw(CDC* pDC)
 		
 		//UpdateLabelText();
 		UpdateLabelText(pDC);
+		UpdateMenu();
 	}
 
 	// TODO: 在此处为本机数据添加绘制代码
@@ -313,6 +344,29 @@ void Cdcmtest1View::UpdateLabelText(CDC* pDC)
 
 }
 
+void Cdcmtest1View::UpdateMenu()
+{
+}
+
+void Cdcmtest1View::SetWindow(int windowcenter, int windowwidth)
+{
+	Cdcmtest1Doc* pDoc = GetDocument();
+	pDoc->m_curWC = windowcenter;
+	pDoc->m_curWW = windowwidth;
+	pDoc->dcm->setWindow(pDoc->m_curWC,pDoc->m_curWW);
+
+	if(pDoc->pDicomDibits!=NULL)
+		delete[]pDoc->pDicomDibits;
+	int size = pDoc->dcm->createWindowsDIB(pDoc->pDicomDibits,0,0,24,1,1);
+		
+	if( size == 0)
+	{
+		AfxMessageBox("Create DIB failed!");
+	}
+		
+	Invalidate();
+}
+
 //BOOL Cdcmtest1View::OnEraseBkgnd(CDC* pDC)
 //{
 //	// TODO: 在此添加消息处理程序代码和/或调用默认值
@@ -451,4 +505,101 @@ void Cdcmtest1View::OnMouseMove(UINT nFlags, CPoint point)
 		InvalidateRect(CRect(0,view_height-2*txt_height,240,view_height-txt_height));//刷新value显示区域的内容
 	}
 
+}
+
+void Cdcmtest1View::OnCtAbd()
+{
+	// TODO: 在此添加命令处理程序代码
+	SetWindow(60,400);
+}
+
+
+void Cdcmtest1View::OnCtAngio()
+{
+	// TODO: 在此添加命令处理程序代码
+	SetWindow(300,600);
+}
+
+
+void Cdcmtest1View::OnCtBone()
+{
+	// TODO: 在此添加命令处理程序代码
+	SetWindow(300,1500);
+}
+
+
+void Cdcmtest1View::OnCtBrain()
+{
+	// TODO: 在此添加命令处理程序代码
+	SetWindow(40,80);
+}
+
+
+void Cdcmtest1View::OnCtChest()
+{
+	// TODO: 在此添加命令处理程序代码
+	SetWindow(40,400);
+}
+
+
+void Cdcmtest1View::OnCtLungs()
+{
+	// TODO: 在此添加命令处理程序代码
+	SetWindow(-400,1500);
+}
+
+
+void Cdcmtest1View::OnOtherWw1()
+{
+	// TODO: 在此添加命令处理程序代码
+	SetWindow(20,40);
+}
+
+
+void Cdcmtest1View::OnOtherWw2()
+{
+	// TODO: 在此添加命令处理程序代码
+	SetWindow(40,80);
+}
+
+
+void Cdcmtest1View::OnOtherWw3()
+{
+	// TODO: 在此添加命令处理程序代码
+	SetWindow(80,160);
+}
+
+
+void Cdcmtest1View::OnOtherWw4()
+{
+	// TODO: 在此添加命令处理程序代码
+	SetWindow(160,320);
+}
+
+
+void Cdcmtest1View::OnOtherWw5()
+{
+	// TODO: 在此添加命令处理程序代码
+	SetWindow(320,640);
+}
+
+
+void Cdcmtest1View::OnOtherWw6()
+{
+	// TODO: 在此添加命令处理程序代码
+	SetWindow(640,1280);
+}
+
+
+void Cdcmtest1View::OnOtherWw7()
+{
+	// TODO: 在此添加命令处理程序代码
+	SetWindow(1280,2560);
+}
+
+
+void Cdcmtest1View::OnOtherWw8()
+{
+	// TODO: 在此添加命令处理程序代码
+	SetWindow(2560,5120);
 }

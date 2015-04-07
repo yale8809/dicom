@@ -21,6 +21,7 @@
 #define DCM_WW				DcmTagKey(0x0028, 0x1051)
 #define DCM_CtnDate			DcmTagKey(0x0008, 0x0023)
 #define DCM_CtnTime			DcmTagKey(0x0008, 0x0033)
+#define DCM_Modality        DcmTagKey(0x0008, 0x0060)
 
 class Cdcmtest1View : public CView
 {
@@ -63,6 +64,8 @@ protected:
 
 private:
 	void UpdateLabelText(CDC* pDC);
+	void UpdateMenu();
+	void SetWindow(int windowcenter, int windowwidth);
 public:
 	DicomImage *dcm;
 	DcmFileFormat *pDicomFile;
@@ -87,6 +90,20 @@ public:
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnCtAbd();
+	afx_msg void OnCtAngio();
+	afx_msg void OnCtBone();
+	afx_msg void OnCtBrain();
+	afx_msg void OnCtChest();
+	afx_msg void OnCtLungs();
+	afx_msg void OnOtherWw1();
+	afx_msg void OnOtherWw2();
+	afx_msg void OnOtherWw3();
+	afx_msg void OnOtherWw4();
+	afx_msg void OnOtherWw5();
+	afx_msg void OnOtherWw6();
+	afx_msg void OnOtherWw7();
+	afx_msg void OnOtherWw8();
 };
 
 #ifndef _DEBUG  // dcmtest1View.cpp 中的调试版本
