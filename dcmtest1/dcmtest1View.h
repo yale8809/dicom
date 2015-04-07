@@ -104,6 +104,7 @@ public:
 	afx_msg void OnOtherWw6();
 	afx_msg void OnOtherWw7();
 	afx_msg void OnOtherWw8();
+	afx_msg void OnInverse();
 };
 
 #ifndef _DEBUG  // dcmtest1View.cpp 中的调试版本

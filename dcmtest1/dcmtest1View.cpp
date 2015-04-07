@@ -45,6 +45,7 @@ BEGIN_MESSAGE_MAP(Cdcmtest1View, CView)
 	ON_UPDATE_COMMAND_UI(ID_Other_WW_6 , OnUpdateTagMenu)
 	ON_UPDATE_COMMAND_UI(ID_Other_WW_7 , OnUpdateTagMenu)
 	ON_UPDATE_COMMAND_UI(ID_Other_WW_8 , OnUpdateTagMenu)
+	ON_UPDATE_COMMAND_UI(ID_Inverse , OnUpdateTagMenu)
 	ON_COMMAND(ID_WCWW_Default , OnUpdateDefaultWCWW)
 	ON_COMMAND(ID_WCWW_FULL , OnUpdateFullWCWW)
 //	ON_WM_ERASEBKGND()
@@ -65,6 +66,7 @@ ON_COMMAND(ID_Other_WW_5, &Cdcmtest1View::OnOtherWw5)
 ON_COMMAND(ID_Other_WW_6, &Cdcmtest1View::OnOtherWw6)
 ON_COMMAND(ID_Other_WW_7, &Cdcmtest1View::OnOtherWw7)
 ON_COMMAND(ID_Other_WW_8, &Cdcmtest1View::OnOtherWw8)
+ON_COMMAND(ID_Inverse, &Cdcmtest1View::OnInverse)
 END_MESSAGE_MAP()
 
 // Cdcmtest1View 构造/析构
@@ -602,4 +604,31 @@ void Cdcmtest1View::OnOtherWw8()
 {
 	// TODO: 在此添加命令处理程序代码
 	SetWindow(2560,5120);
+}
+
+
+void Cdcmtest1View::OnInverse()
+{
+	// TODO: 在此添加命令处理程序代码
+	Cdcmtest1Doc* pDoc = GetDocument();
+	EP_Polarity polarity= pDoc->dcm->getPolarity();
+	if(polarity == EPP_Normal)
+	{
+		pDoc->dcm->setPolarity(EPP_Reverse);
+	}
+	else
+	{
+		pDoc->dcm->setPolarity(EPP_Normal);
+	}
+
+	if(pDoc->pDicomDibits!=NULL)
+		delete[]pDoc->pDicomDibits;
+	int size = pDoc->dcm->createWindowsDIB(pDoc->pDicomDibits,0,0,24,1,1);
+		
+	if( size == 0)
+	{
+		AfxMessageBox("Create DIB failed!");
+	}
+		
+	Invalidate();
 }
