@@ -52,11 +52,18 @@ protected:
 #endif // SHARED_HANDLERS
 public:
 	afx_msg void OnFileOpen();
+
+public:
 	DicomImage *dcm;
 	LPBITMAPINFOHEADER m_lpBMIH;
 	void *pDicomDibits ;
 	DcmFileFormat *pDicomFile;
 	DcmDataset *pDataset;
+	double m_curWC;
+	double m_curWW;
+
+private:
 	CString m_Pathname;
 	CString strPicPath;
+
 };

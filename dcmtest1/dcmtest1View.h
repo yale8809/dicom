@@ -71,12 +71,17 @@ public:
 private:
 	bool m_bShowTagEnable;
 
-	double m_curWC;
-	double m_curWW;
 	bool isResetWindow;
 	CPoint m_startPoint;
 	CPoint m_curPoint;
 	CPoint m_endPoint;
+	int m_destX;
+	int m_destY;
+	int m_destWidth;
+	int m_destHeight;
+	int m_pixelX;
+	int m_pixelY;
+	int m_pixelValue;
 public:
 //	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);

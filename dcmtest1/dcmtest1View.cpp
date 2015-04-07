@@ -27,6 +27,8 @@ BEGIN_MESSAGE_MAP(Cdcmtest1View, CView)
 	// 标准打印命令
 	ON_COMMAND(ID_SHOW_TAG , OnShowTag)
 	ON_UPDATE_COMMAND_UI(ID_SHOW_TAG , OnUpdateTagMenu)
+	ON_UPDATE_COMMAND_UI(ID_WCWW_FULL , OnUpdateTagMenu)
+	ON_UPDATE_COMMAND_UI(ID_WCWW_Default , OnUpdateTagMenu)
 	ON_COMMAND(ID_WCWW_Default , OnUpdateDefaultWCWW)
 	ON_COMMAND(ID_WCWW_FULL , OnUpdateFullWCWW)
 //	ON_WM_ERASEBKGND()
@@ -42,8 +44,14 @@ Cdcmtest1View::Cdcmtest1View()
 	pDicomFile(NULL),
 	pDataset(NULL),
 	m_bShowTagEnable(false),
-	m_curWC(0),
-	m_curWW(0)
+	m_destX(0),
+	m_destY(0),
+	m_destWidth(0),
+	m_destHeight(0),
+	m_pixelX(0),
+	m_pixelY(0),
+	m_pixelValue(0),
+	isResetWindow(false)
 {
 	// TODO: 在此处添加构造代码
 	//AllocConsole();                     // 打开控制台资源
@@ -105,114 +113,27 @@ void Cdcmtest1View::OnDraw(CDC* pDC)
 	//	}
 	//}
 
-
-
-	//double min,max;
-	//dcm->getMinMaxValues(min,max);
-	//EI_Status status = dcm->getStatus();
-	//FILE* f = fopen("D:\\Guo_Yu\\Project\\dcmdata\\AELQYFNH\\temp.bmp","wb");
-	//dcm->writeBMP(f,8);
-	//fclose(f);
-
-	//LPBITMAPINFOHEADER m_lpBMIH;
-	//m_lpBMIH = (LPBITMAPINFOHEADER) new char[sizeof(BITMAPINFOHEADER)
-	//	+sizeof(RGBQUAD)*256];
-	//m_lpBMIH->biSize = sizeof(BITMAPINFOHEADER);
-	//m_lpBMIH->biWidth =dcm->getWidth();
-	//m_lpBMIH->biHeight = dcm->getHeight();
-	//m_lpBMIH->biPlanes = 1;
-	//m_lpBMIH->biBitCount = 24;
-	//m_lpBMIH->biCompression = BI_RGB;
-	//m_lpBMIH->biSizeImage = 0;
-	//m_lpBMIH->biXPelsPerMeter = 0;
-	//m_lpBMIH->biYPelsPerMeter = 0;
-	//double centre,width;
-	//double min,max;
-	//dcm->getMinMaxValues(min,max);
-	////dcm->getWindow(centre,width);
-	//width = max-min;
-	//centre = (max+min)/2;
-	//dcm->setWindow(35,320);
-
-	//dcm->setHistogramWindow();
-
-	//void *pDicomDibits ;
-	//dcm->createWindowsDIB(pDicomDibits,0,0,24,1,1);
-
-//	RGBQUAD pColorTable[256];
-//	for(int i=0;i<256;i++)
-//	{
-//
-//		pColorTable[i].rgbBlue=i;
-//		pColorTable[i].rgbGreen=i;
-//		pColorTable[i].rgbRed=i;
-//		pColorTable[i].rgbReserved=0;
-//	}
-//	//定义一个bmpinfo需要内存大小的内存
-//	char p[sizeof(BITMAPINFOHEADER)+256*4];
-//	memcpy(p,&m_lpBMIH,sizeof(BITMAPINFOHEADER));
-//	memcpy(p+sizeof(BITMAPINFOHEADER),pColorTable,1024);
-//	PBITMAPINFO BitmapInfo = (PBITMAPINFO)p;
-//
-//
-////颜色表
-// int colorTableLng;
-// colorTableLng=256;
-//
-// // 创建调色板
-// HPALETTE hPalette=0,hOldPal;
-// if (colorTableLng!=0)
-// {
-//  //定义颜色表指针pColorTable,指向DIB的颜色表
-//  //申请缓冲区，生成LOGPALETTE结构
-//  LPLOGPALETTE pLogPal = (LPLOGPALETTE)new char[2*sizeof(WORD)
-//   +colorTableLng * sizeof(PALETTEENTRY)];
-//  pLogPal->palVersion = 0x300;
-//  pLogPal->palNumEntries =colorTableLng;
-//  for(int i = 0; i < colorTableLng; i++)
-//  {
-//   pLogPal->palPalEntry[i].peRed= pColorTable[i].rgbRed;
-//   pLogPal->palPalEntry[i].peGreen =pColorTable[i].rgbGreen;
-//   pLogPal->palPalEntry[i].peBlue = pColorTable[i].rgbBlue;
-//   pLogPal->palPalEntry[i].peFlags = 0;
-//  }
-//
-//  //
-//  //创建逻辑调色板
-//  hPalette =::CreatePalette(pLogPal);
-//  // 将调色板选入系统
-//  hOldPal=::SelectPalette(pDC->GetSafeHdc(), hPalette, TRUE);
-//  //实现调色板
-//  pDC->RealizePalette();
-//  //释放缓冲区
-//  delete []pLogPal;
-// }
-//
-// //
-// //DIB显示所需要的模式
-// pDC->SetStretchBltMode(COLORONCOLOR);
-
 	//Set the view background color
 	CBrush   backBrush(RGB(0, 0,0));
               //   保存旧刷子  
     pDC->SelectObject(&backBrush);  
     CRect   rect;
-    pDC->GetClipBox(&rect);           //   擦除所需的区域  
+	GetClientRect(&rect);
+    //pDC->GetClipBox(&rect);           //   擦除所需的区域  
     pDC->PatBlt(rect.left,rect.top,rect.Width(),rect.Height(),PATCOPY); 
 
 	if(pDoc->dcm != NULL)
-	{
+	{		
 		//CRect rect;
 		//GetClientRect(&rect);
-		int destX,destY,destWidth,destHeight;
-		destHeight = rect.Height();
-		destWidth = pDoc->m_lpBMIH->biWidth*destHeight/pDoc->m_lpBMIH->biHeight;
-		destX = (rect.Width() - destWidth)/2;
-		destY = 0;
+		m_destHeight = rect.Height();
+		m_destWidth = pDoc->m_lpBMIH->biWidth*m_destHeight/pDoc->m_lpBMIH->biHeight;
+		m_destX = (rect.Width() - m_destWidth)/2;
+		m_destY = 0;
 
 
-		StretchDIBits(pDC->GetSafeHdc(),destX,destY,destWidth,
-			destHeight,0,0,pDoc->m_lpBMIH->biWidth,
+		StretchDIBits(pDC->GetSafeHdc(),m_destX,m_destY,m_destWidth,
+			m_destHeight,0,0,pDoc->m_lpBMIH->biWidth,
 			pDoc->m_lpBMIH->biHeight,pDoc->pDicomDibits,
 			(LPBITMAPINFO)pDoc->m_lpBMIH,DIB_PAL_COLORS,SRCCOPY);
 		m_bShowTagEnable = true;
@@ -248,9 +169,9 @@ void Cdcmtest1View::OnUpdateDefaultWCWW()
 	if (pDoc->pDataset->findAndGetOFString(DCM_WC, wc).good()&&
 		pDoc->pDataset->findAndGetOFString(DCM_WW, ww).good())
 	{
-		m_curWC = atof(wc.c_str());
-		m_curWW = atof(ww.c_str());
-		pDoc->dcm->setWindow(m_curWC,m_curWW);
+		pDoc->m_curWC = atof(wc.c_str());
+		pDoc->m_curWW = atof(ww.c_str());
+		pDoc->dcm->setWindow(pDoc->m_curWC,pDoc->m_curWW);
 	}
 	
 		
@@ -271,9 +192,9 @@ void Cdcmtest1View::OnUpdateFullWCWW()
 	Cdcmtest1Doc* pDoc = GetDocument();
 	double min,max;
 	pDoc->dcm->getMinMaxValues(min,max);
-	m_curWC = (max-min)/2;
-	m_curWW = (max+min)/2;
-	pDoc->dcm->setWindow(m_curWC,m_curWW);
+	pDoc->m_curWW = (max-min)/2;
+	pDoc->m_curWC = (max+min)/2;
+	pDoc->dcm->setWindow(pDoc->m_curWC,pDoc->m_curWW);
 
 	if(pDoc->pDicomDibits!=NULL)
 		delete[]pDoc->pDicomDibits;
@@ -366,10 +287,10 @@ void Cdcmtest1View::UpdateLabelText(CDC* pDC)
 	}
 
 	char wc_ww[10];
-	itoa(m_curWC, wc_ww, 10);
+	itoa(pDoc->m_curWC, wc_ww, 10);
 	pDC->TextOutA(0, view_height-txt_height, wc_ww);
 
-	itoa(m_curWW, wc_ww, 10);
+	itoa(pDoc->m_curWW, wc_ww, 10);
 	pDC->TextOutA(txt_width/2, view_height-txt_height, wc_ww);
 
 	tempstring.clear();
@@ -381,6 +302,13 @@ void Cdcmtest1View::UpdateLabelText(CDC* pDC)
 	if (pDoc->pDataset->findAndGetOFString(DCM_CtnTime, tempstring).good())
 	{
 		pDC->TextOutA(view_width-txt_width/2, view_height-txt_height, tempstring.data());
+	}
+		
+	if(m_pixelX!=0&&m_pixelY!=0)
+	{
+		CString value;
+		value.Format("X:%d Y:%d value:%d",m_pixelX,m_pixelY,m_pixelValue);
+		pDC->TextOutA(0, view_height-2*txt_height,value);
 	}
 
 }
@@ -431,34 +359,96 @@ void Cdcmtest1View::OnMouseMove(UINT nFlags, CPoint point)
 
 	CView::OnMouseMove(nFlags, point);
 	Cdcmtest1Doc* pDoc = GetDocument();
+	
+	int txt_width = 240;
+	int txt_height = 20;
+	CRect   rect;
+	GetClientRect(&rect);
+	int view_width = rect.Width();
+	int view_height = rect.Height();
 
-	if (isResetWindow && pDoc->dcm!=NULL) 
+	if(pDoc->dcm!=NULL)
 	{
-		if(abs(point.x-m_curPoint.x)+abs(point.y-m_curPoint.y)>10)
+		if (isResetWindow) 
 		{
-			printf("m_curPoint.x = %d, m_curPoint.y = %d \r\n",m_curPoint.x, m_curPoint.y);
-			printf("point.x = %d, point.y = %d \r\n",point.x, point.y);
-			m_curWC=m_curWC+(-point.x+m_curPoint.x);
-			m_curWW=m_curWW+(point.y-m_curPoint.y);
-			m_curPoint.x=point.x;
-			m_curPoint.y=point.y;
-			if(m_curWC>2047)
-				m_curWC=2047;
-			if(m_curWC<-2048)
-				m_curWC=-2048;
-			if(m_curWW>2047)
-				m_curWW=2047;
-			if(m_curWW<-2048)
-				m_curWW = -2048;
-			ASSERT_VALID(pDoc);
-			pDoc->dcm->setWindow(m_curWC,m_curWW);
-			if(pDoc->pDicomDibits!=NULL)
-				delete[]pDoc->pDicomDibits;
-			int m_iDibSize=pDoc->dcm->createWindowsDIB(pDoc->pDicomDibits,0,0,24,1,1);
-			if(m_iDibSize==0)
-				AfxMessageBox("createWindowsDIB创建DIB文件出错！");
-			Invalidate();
+			if(abs(point.x-m_curPoint.x)+abs(point.y-m_curPoint.y)>10)
+			{
+				printf("m_curPoint.x = %d, m_curPoint.y = %d \r\n",m_curPoint.x, m_curPoint.y);
+				printf("point.x = %d, point.y = %d \r\n",point.x, point.y);
+				pDoc->m_curWC=pDoc->m_curWC+(-point.x+m_curPoint.x);
+				pDoc->m_curWW=pDoc->m_curWW+(point.y-m_curPoint.y);
+				m_curPoint.x=point.x;
+				m_curPoint.y=point.y;
+				if(pDoc->m_curWC>2047)
+					pDoc->m_curWC=2047;
+				if(pDoc->m_curWC<-2048)
+					pDoc->m_curWC=-2048;
+				if(pDoc->m_curWW>2047)
+					pDoc->m_curWW=2047;
+				if(pDoc->m_curWW<-2048)
+					pDoc->m_curWW = -2048;
+				ASSERT_VALID(pDoc);
+				pDoc->dcm->setWindow(pDoc->m_curWC,pDoc->m_curWW);
+				if(pDoc->pDicomDibits!=NULL)
+					delete[]pDoc->pDicomDibits;
+				int m_iDibSize=pDoc->dcm->createWindowsDIB(pDoc->pDicomDibits,0,0,24,1,1);
+				if(m_iDibSize==0)
+					AfxMessageBox("createWindowsDIB创建DIB文件出错！");
+				Invalidate();
+			}
 		}
-	}
-}
 
+		if (point.x>m_destX && point.y >m_destY && 
+			point.x < (m_destX+m_destWidth) && point.y < (m_destY+m_destHeight))
+		{
+			m_pixelX = (point.x - m_destX)*pDoc->m_lpBMIH->biWidth/m_destWidth;
+			m_pixelY = (point.y - m_destY)*pDoc->m_lpBMIH->biHeight/m_destHeight;
+
+			//Uint8 *pixelData = (Uint8 *)(pDoc->dcm->getOutputData(8 /* bits per sample */));
+			void *pixelData = (void *)pDoc->dcm->getInterData()->getData();
+			if (pixelData != NULL)
+			{
+				EP_Representation pixelRep = pDoc->dcm->getInterData()->getRepresentation();
+   
+				switch(pixelRep)
+				{
+					case EPR_Uint8:
+						// UCHAR;
+						m_pixelValue = ((Uint8*)pixelData)[m_pixelY*pDoc->m_lpBMIH->biWidth+m_pixelX];
+						break;
+					case EPR_Sint8:
+						//CHAR
+						m_pixelValue = ((Sint8*)pixelData)[m_pixelY*pDoc->m_lpBMIH->biWidth+m_pixelX];
+						break;
+					case EPR_Uint16:
+						//USHORT
+						m_pixelValue = ((Uint16*)pixelData)[m_pixelY*pDoc->m_lpBMIH->biWidth+m_pixelX];
+						break;
+					case EPR_Sint16:
+						// SHORT
+						m_pixelValue = ((Sint16*)pixelData)[m_pixelY*pDoc->m_lpBMIH->biWidth+m_pixelX];
+						break;
+					case EPR_Uint32:
+						//UINT
+						m_pixelValue = ((Uint32*)pixelData)[m_pixelY*pDoc->m_lpBMIH->biWidth+m_pixelX];
+						break;
+					case EPR_Sint32:
+						//INT
+						m_pixelValue = ((Sint32*)pixelData)[m_pixelY*pDoc->m_lpBMIH->biWidth+m_pixelX];
+						break;
+				   default:
+						m_pixelValue = ((Uint8*)pixelData)[m_pixelY*pDoc->m_lpBMIH->biWidth+m_pixelX];
+			   }
+			}
+
+		}
+		else
+		{
+			m_pixelX = 0;
+			m_pixelY = 0;
+		}
+		
+		InvalidateRect(CRect(0,view_height-2*txt_height,240,view_height-txt_height));//刷新value显示区域的内容
+	}
+
+}

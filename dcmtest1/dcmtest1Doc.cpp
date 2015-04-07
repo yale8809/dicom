@@ -42,7 +42,9 @@ Cdcmtest1Doc::Cdcmtest1Doc()
 	: dcm(NULL),
 	m_Pathname(_T("")),
 	strPicPath(_T("")),
-	pDicomDibits(NULL)
+	pDicomDibits(NULL),
+	m_curWC(0),
+	m_curWW(0)
 {
 	// TODO: 在此添加一次性构造代码
 
@@ -78,7 +80,6 @@ BOOL Cdcmtest1Doc::OnOpenDocument(LPCTSTR lpszPathName)
 	{
 		AfxMessageBox(DicomImage::getString(dcm->getStatus()));
 	}
-	dcm->setWindow(35,320);
 
 	m_lpBMIH = (LPBITMAPINFOHEADER) new char[sizeof(BITMAPINFOHEADER)
 	+sizeof(RGBQUAD)*256];
@@ -93,6 +94,16 @@ BOOL Cdcmtest1Doc::OnOpenDocument(LPCTSTR lpszPathName)
 	m_lpBMIH->biYPelsPerMeter = 0;
 	
 		
+	
+	OFString wc,ww;
+	if (pDataset->findAndGetOFString(DCM_WC, wc).good()&&
+		pDataset->findAndGetOFString(DCM_WW, ww).good())
+	{
+		m_curWC = atof(wc.c_str());
+		m_curWW = atof(ww.c_str());
+		dcm->setWindow(m_curWC,m_curWW);
+	}
+
 	if(pDicomDibits!=NULL)
 		delete[]pDicomDibits;
 	int size = dcm->createWindowsDIB(pDicomDibits,0,0,24,1,1);
